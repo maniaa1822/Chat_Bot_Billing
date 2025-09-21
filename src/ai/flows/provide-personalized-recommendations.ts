@@ -42,15 +42,22 @@ export async function providePersonalizedRecommendations(input: PersonalizedReco
 
 const prompt = ai.definePrompt({
   name: 'providePersonalizedRecommendationsPrompt',
-  input: {schema: PersonalizedRecommendationsInputSchema},
+  input: {schema: z.object({
+    parsedString: z.string(),
+    user_intent: z.string(),
+    reply: z.string(),
+    next_missing_field: z.string().nullable(),
+    ask: z.string().nullable(),
+    confidence: z.string(),
+    notes: z.array(z.string()),
+  })},
   output: {schema: PersonalizedRecommendationsOutputSchema},
   prompt: `You are an AI assistant that provides personalized recommendations based on the user's input.
 
   Given the following user information, suggest 1-3 relevant actions that the user can take next. The actions should be short labels suitable for display as buttons in a UI.
 
   Parsed Data:
-  {{#each (keys parsed)}} - {{@this}}: {{get ../parsed @this}}
-  {{/each}}
+  {{{parsedString}}}
 
   User Intent: {{{user_intent}}}
   Reply: {{{reply}}}
@@ -78,7 +85,14 @@ const providePersonalizedRecommendationsFlow = ai.defineFlow(
     outputSchema: PersonalizedRecommendationsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const parsedString = Object.entries(input.parsed)
+      .map(([key, value]) => `- ${key}: ${value}`)
+      .join('\n');
+
+    const {output} = await prompt({
+      ...input,
+      parsedString,
+    });
     return output!;
   }
 );
