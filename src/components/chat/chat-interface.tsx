@@ -59,7 +59,9 @@ export function ChatInterface() {
         const recommendationMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: recommendations.join('\n'),
+          content:
+            'Ecco alcune azioni che puoi intraprendere:\n' +
+            recommendations.map((r) => `• ${r}`).join('\n'),
         };
         setMessages((prev) => [...prev, recommendationMessage]);
         // Reset last AI result to avoid looping back here.
