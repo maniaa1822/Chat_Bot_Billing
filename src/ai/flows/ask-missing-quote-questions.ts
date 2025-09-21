@@ -64,7 +64,9 @@ Guide to the next missing field with one concise question.
 
 NEVER output prose—return ONLY one JSON object matching the contract below.
 
-Always return ONLY this JSON object
+If a field isn’t given, set it to null—never invent.
+
+Always return ONLY this JSON object, merging userInput with the provided parsed data:
 {
   "parsed": {
     "cap": null,
@@ -201,7 +203,9 @@ Example B — messy input
 
 Important: Return only the JSON object. No markdown, no extra text, no explanations outside reply/notes.
 
-User Input: {{{userInput}}}
+Input:
+- User Input: {{{userInput}}}
+- Parsed Data: {{parsed}}
 
 Based on the user input and the already parsed data, provide the next response.
 `, 

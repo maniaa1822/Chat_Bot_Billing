@@ -54,7 +54,9 @@ Guide to the next missing field with one concise question.
 
 NEVER output prose—return ONLY one JSON object matching the contract below.
 
-Always return ONLY this JSON object
+If a field isn’t given, set it to null—never invent.
+
+Always return ONLY this JSON object, with nulls for any information not provided by the user.
 {
   "parsed": {
     "cap": null,
