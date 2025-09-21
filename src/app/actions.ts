@@ -6,10 +6,11 @@ import {
 } from '@/ai/flows/extract-quote-info-from-chat';
 
 export async function getAiResponse(
-  userInput: string
+  userInput: string,
+  history: QuoteInfoOutput['parsed'] | null
 ): Promise<QuoteInfoOutput> {
   try {
-    const response = await extractQuoteInfoFromChat({ userInput });
+    const response = await extractQuoteInfoFromChat({ userInput, history });
     return response;
   } catch (error) {
     console.error('Error getting AI response:', error);

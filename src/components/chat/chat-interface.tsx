@@ -7,6 +7,7 @@ import { CardContent } from '@/components/ui/card';
 import { ChatMessages } from './chat-messages';
 import { ChatInput } from './chat-input';
 import { InfoSummary } from './info-summary';
+import { merge } from 'lodash';
 
 export interface Message {
   id: string;
@@ -45,7 +46,7 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const aiResult = await getAiResponse(text);
+      const aiResult = await getAiResponse(text, parsedData);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -55,7 +56,8 @@ export function ChatInterface() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-      setParsedData(aiResult.parsed);
+      const newParsedData = merge({}, parsedData, aiResult.parsed);
+      setParsedData(newParsedData);
     } catch (error) {
       console.error(error);
       const errorMessage: Message = {

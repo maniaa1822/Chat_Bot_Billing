@@ -13,6 +13,17 @@ import {z} from 'genkit';
 
 const QuoteInfoInputSchema = z.object({
   userInput: z.string().describe('The user input from the chat interface.'),
+  history: z
+    .object({
+      cap: z.string().nullable(),
+      dwelling: z.string().nullable(),
+      monthly_kwh: z.number().nullable(),
+      bill_eur: z.number().nullable(),
+      storage_pref: z.string().nullable(),
+      incentives: z.string().nullable(),
+    })
+    .nullable()
+    .describe('Previously collected information from the conversation.'),
 });
 export type QuoteInfoInput = z.infer<typeof QuoteInfoInputSchema>;
 
@@ -200,8 +211,13 @@ Example B — messy input
 
 
 Important: Return only the JSON object. No markdown, no extra text, no explanations outside reply/notes.
-
-{{userInput}}`,
+Here is the user input: {{{userInput}}}
+{{#if history}}
+This is the information we have so far:
+{{{JSON.stringify history}}}
+Do not ask for this information again.
+{{/if}}
+`,
 });
 
 const extractQuoteInfoFromChatFlow = ai.defineFlow(
