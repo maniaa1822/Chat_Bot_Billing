@@ -17,6 +17,7 @@ export interface Message {
   content: string;
   actions?: string[];
   quote?: QuoteDetails;
+  customerData?: QuoteInfoOutput['parsed'];
 }
 
 const initialMessage: Message = {
@@ -64,6 +65,7 @@ export function ChatInterface() {
           role: 'assistant',
           content: 'Ecco una stima del tuo impianto fotovoltaico personalizzato:',
           quote: quote,
+          customerData: lastAiResult.parsed,
         };
         setMessages((prev) => [...prev, quoteMessage]);
         // Reset last AI result to allow for new conversations.

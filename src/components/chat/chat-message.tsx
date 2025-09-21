@@ -62,7 +62,7 @@ export function ChatMessage({
         <p className="whitespace-pre-wrap">{message.content}</p>
         {message.quote && (
           <div className="mt-4 bg-background p-4 rounded-lg border">
-            <QuoteResult quote={message.quote} />
+            <QuoteResult quote={message.quote} customerData={message.customerData} />
           </div>
         )}
         {isAssistant && message.actions && onActionClick && (
