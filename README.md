@@ -44,7 +44,7 @@ npm install
 
 ### 2. Set Up Environment Variables
 
-The application requires an API key for the Google Gemini model.
+The application requires an API key for the Google Gemini model. If this key is not configured correctly, the application will throw an error, and the chatbot will respond with a generic error message like `Mi dispiace, si è verificato un errore. Per favore, riprova più tardi.`.
 
 1.  Obtain an API key from [Google AI Studio](https://makersuite.google.com/).
 2.  Create a new file named `.env` in the root of the project.
