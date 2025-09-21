@@ -15,8 +15,10 @@ export async function getAiResponse(
       history: history || undefined,
     });
     return response;
-  } catch (error) {
-    console.error('Error in getAiResponse:', error);
+  } catch (e: any) {
+    console.error('Error in getAiResponse:', e);
+    // Return the actual error message to the UI for debugging.
+    const errorMessage = e.message || 'An unknown error occurred.';
     return {
       parsed: history || {
         cap: null,
@@ -27,8 +29,7 @@ export async function getAiResponse(
         incentives: null,
       },
       user_intent: 'OUT_OF_SCOPE',
-      reply:
-        'Mi dispiace, si è verificato un errore. Per favore, riprova più tardi.',
+      reply: `Mi dispiace, si è verificato un errore. Dettagli: ${errorMessage}`,
       next_missing_field: null,
       ask: null,
       suggest_actions: [],
@@ -37,5 +38,3 @@ export async function getAiResponse(
     };
   }
 }
-
-    
