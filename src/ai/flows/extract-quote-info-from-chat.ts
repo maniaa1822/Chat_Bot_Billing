@@ -98,7 +98,7 @@ Your goal is to extract information, answer questions, and guide users to the ne
 **CONVERSATION:**
 
 **Existing Information (history):**
-{{#if history}}
+{{#if historyHasContent}}
 \`\`\`json
 {{{JSONstringify history}}}
 \`\`\`
@@ -112,6 +112,11 @@ No information collected yet.
 ---
 Based on the full context, provide the complete JSON response.
 `,
+  template: {
+    helpers: {
+      JSONstringify: (obj: any) => JSON.stringify(obj, null, 2),
+    },
+  },
 });
 
 const extractQuoteInfoFromChatFlow = ai.defineFlow(
@@ -121,9 +126,15 @@ const extractQuoteInfoFromChatFlow = ai.defineFlow(
     outputSchema: QuoteInfoOutputSchema,
   },
   async (input) => {
-    const { output } = await extractQuoteInfoFromChatPrompt(input);
+    // Determine if history has meaningful content
+    const historyHasContent = !!(
+      input.history && Object.values(input.history).some((v) => v !== null)
+    );
+
+    const { output } = await extractQuoteInfoFromChatPrompt({
+      ...input,
+      historyHasContent,
+    });
     return output!;
   }
 );
-
-    
