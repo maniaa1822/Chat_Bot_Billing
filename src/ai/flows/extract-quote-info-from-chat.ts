@@ -24,6 +24,7 @@ const QuoteInfoInputSchema = z.object({
     })
     .optional()
     .describe('Previously collected information from the conversation.'),
+  historyHasContent: z.boolean().optional(),
 });
 export type QuoteInfoInput = z.infer<typeof QuoteInfoInputSchema>;
 
