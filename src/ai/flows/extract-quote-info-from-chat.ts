@@ -22,7 +22,7 @@ const QuoteInfoInputSchema = z.object({
       storage_pref: z.string().nullable(),
       incentives: z.string().nullable(),
     })
-    .nullable()
+    .optional()
     .describe('Previously collected information from the conversation.'),
 });
 export type QuoteInfoInput = z.infer<typeof QuoteInfoInputSchema>;
@@ -227,13 +227,7 @@ const extractQuoteInfoFromChatFlow = ai.defineFlow(
     outputSchema: QuoteInfoOutputSchema,
   },
   async (input) => {
-    // Create a version of the input for the prompt, removing history if it's null.
-    const promptInput: Record<string, any> = { ...input };
-    if (!promptInput.history) {
-      delete promptInput.history;
-    }
-
-    const { output } = await extractQuoteInfoFromChatPrompt(promptInput as QuoteInfoInput);
+    const { output } = await extractQuoteInfoFromChatPrompt(input);
     return output!;
   }
 );

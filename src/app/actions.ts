@@ -10,7 +10,7 @@ export async function getAiResponse(
   history: QuoteInfoOutput['parsed'] | null
 ): Promise<QuoteInfoOutput> {
   try {
-    const response = await extractQuoteInfoFromChat({ userInput, history });
+    const response = await extractQuoteInfoFromChat({ userInput, history: history ?? undefined });
     return response;
   } catch (error) {
     console.error('Error getting AI response for input:', { userInput, history });
