@@ -10,7 +10,10 @@ export async function getAiResponse(
   history: QuoteInfoOutput['parsed'] | null
 ): Promise<QuoteInfoOutput> {
   try {
-    const response = await extractQuoteInfoFromChat({ userInput, history: history ?? undefined });
+    const response = await extractQuoteInfoFromChat({
+      userInput,
+      history: history || undefined,
+    });
     return response;
   } catch (error) {
     console.error('Error in getAiResponse:', error);
@@ -34,3 +37,5 @@ export async function getAiResponse(
     };
   }
 }
+
+    
