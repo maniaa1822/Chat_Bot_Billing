@@ -11,10 +11,16 @@ import {
   CircleDollarSign,
   Battery,
   Sparkles,
+  Gauge,
+  StickyNote,
 } from 'lucide-react';
 
 type InfoSummaryProps = {
   data: QuoteInfoOutput['parsed'] | null;
+  aiState: {
+    confidence: string | null;
+    notes: string[] | null;
+  };
 };
 
 const iconMap = {
@@ -44,7 +50,13 @@ const preferenceLabels: { [key: string]: string } = {
   non_so: 'Non so',
 };
 
-export function InfoSummary({ data }: InfoSummaryProps) {
+const confidenceColors: { [key: string]: string } = {
+  bassa: 'bg-red-100 text-red-800 border-red-200',
+  media: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  alta: 'bg-green-100 text-green-800 border-green-200',
+};
+
+export function InfoSummary({ data, aiState }: InfoSummaryProps) {
   const summaryItems = [
     { key: 'cap', label: 'CAP', value: data?.cap, Icon: iconMap.cap },
     {
@@ -79,7 +91,9 @@ export function InfoSummary({ data }: InfoSummaryProps) {
     },
   ].filter((item) => item.value !== null && item.value !== undefined);
 
-  if (summaryItems.length === 0) {
+  const hasAiState = aiState.confidence || (aiState.notes && aiState.notes.length > 0);
+
+  if (summaryItems.length === 0 && !hasAiState) {
     return (
       <p className="text-sm text-center text-muted-foreground h-6 flex items-center justify-center">
         Inizia la conversazione per vedere qui le informazioni raccolte.
@@ -88,13 +102,34 @@ export function InfoSummary({ data }: InfoSummaryProps) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2 justify-center h-6">
+    <div className="flex flex-wrap gap-2 justify-center min-h-6">
       {summaryItems.map((item) => (
         <Badge key={item.key} variant="secondary" className="text-sm py-1 px-3">
           <item.Icon className="mr-2 h-4 w-4" />
           {item.label}: <span className="font-semibold ml-1">{item.value}</span>
         </Badge>
       ))}
+      {aiState.confidence && (
+        <Badge
+          variant="outline"
+          className={`text-sm py-1 px-3 ${
+            confidenceColors[aiState.confidence] || ''
+          }`}
+        >
+          <Gauge className="mr-2 h-4 w-4" />
+          Confidenza:{' '}
+          <span className="font-semibold ml-1 capitalize">
+            {aiState.confidence}
+          </span>
+        </Badge>
+      )}
+      {aiState.notes && aiState.notes.length > 0 && (
+        <Badge variant="outline" className="text-sm py-1 px-3">
+          <StickyNote className="mr-2 h-4 w-4" />
+          Note:
+          <span className="font-semibold ml-1">{aiState.notes.join(', ')}</span>
+        </Badge>
+      )}
     </div>
   );
 }

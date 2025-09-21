@@ -32,6 +32,10 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([initialMessage]);
   const [parsedData, setParsedData] =
     useState<QuoteInfoOutput['parsed'] | null>(null);
+  const [aiState, setAiState] = useState<{
+    confidence: string | null;
+    notes: string[] | null;
+  }>({ confidence: null, notes: null });
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async (text: string) => {
@@ -58,6 +62,10 @@ export function ChatInterface() {
       setMessages((prev) => [...prev, assistantMessage]);
       const newParsedData = merge({}, parsedData, aiResult.parsed);
       setParsedData(newParsedData);
+      setAiState({
+        confidence: aiResult.confidence,
+        notes: aiResult.notes,
+      });
     } catch (error) {
       console.error(error);
       const errorMessage: Message = {
@@ -67,6 +75,10 @@ export function ChatInterface() {
           'Mi dispiace, si è verificato un errore. Per favore, riprova più tardi.',
       };
       setMessages((prev) => [...prev, errorMessage]);
+      setAiState({
+        confidence: 'bassa',
+        notes: ['An error occurred on the server.'],
+      });
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +87,7 @@ export function ChatInterface() {
   return (
     <div className="w-full max-w-3xl flex flex-col h-full bg-card rounded-xl shadow-lg border">
       <div className="p-4 border-b">
-        <InfoSummary data={parsedData} />
+        <InfoSummary data={parsedData} aiState={aiState} />
       </div>
       <CardContent className="flex-grow p-0 flex flex-col">
         <ChatMessages
