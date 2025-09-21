@@ -24,7 +24,6 @@ const QuoteInfoInputSchema = z.object({
     })
     .optional()
     .describe('Previously collected information from the conversation.'),
-  historyHasContent: z.boolean().optional(),
 });
 export type QuoteInfoInput = z.infer<typeof QuoteInfoInputSchema>;
 
@@ -63,7 +62,11 @@ export async function extractQuoteInfoFromChat(input: QuoteInfoInput): Promise<Q
 
 const extractQuoteInfoFromChatPrompt = ai.definePrompt({
   name: 'extractQuoteInfoFromChatPrompt',
-  input: {schema: QuoteInfoInputSchema},
+  input: {schema: z.object({
+    userInput: z.string(),
+    historyString: z.string(),
+    historyHasContent: z.boolean(),
+  })},
   output: {schema: QuoteInfoOutputSchema},
   prompt: `You are Preventivatore AI, a conversational assistant helping users in Italy get photovoltaic quotes.
 Your goal is to extract information, answer questions, and guide users to the next step.
@@ -101,7 +104,7 @@ Your goal is to extract information, answer questions, and guide users to the ne
 **Existing Information (history):**
 {{#if historyHasContent}}
 \`\`\`json
-{{{JSONstringify history}}}
+{{{historyString}}}
 \`\`\`
 {{else}}
 No information collected yet.
@@ -113,11 +116,6 @@ No information collected yet.
 ---
 Based on the full context, provide the complete JSON response.
 `,
-  template: {
-    helpers: {
-      JSONstringify: (obj: any) => JSON.stringify(obj, null, 2),
-    },
-  },
 });
 
 const extractQuoteInfoFromChatFlow = ai.defineFlow(
@@ -127,14 +125,16 @@ const extractQuoteInfoFromChatFlow = ai.defineFlow(
     outputSchema: QuoteInfoOutputSchema,
   },
   async (input) => {
-    // Determine if history has meaningful content
+    // Determine if history has meaningful content and stringify it.
     const historyHasContent = !!(
       input.history && Object.values(input.history).some((v) => v !== null)
     );
+    const historyString = JSON.stringify(input.history || {}, null, 2);
 
     const { output } = await extractQuoteInfoFromChatPrompt({
-      ...input,
+      userInput: input.userInput,
       historyHasContent,
+      historyString,
     });
     return output!;
   }
