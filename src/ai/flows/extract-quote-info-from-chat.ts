@@ -226,10 +226,15 @@ const extractQuoteInfoFromChatFlow = ai.defineFlow(
     inputSchema: QuoteInfoInputSchema,
     outputSchema: QuoteInfoOutputSchema,
   },
-  async input => {
-    // Exclude history if it's null
-    const promptInput = input.history ? input : { userInput: input.userInput };
-    const {output} = await extractQuoteInfoFromChatPrompt(promptInput);
+  async (input) => {
+    let promptInput: QuoteInfoInput = { ...input };
+    if (!promptInput.history) {
+      // Create a version of the input without the history field for the prompt.
+      const { history, ...rest } = promptInput;
+      promptInput = rest as any; // Cast to avoid TypeScript complaining about missing history
+    }
+
+    const { output } = await extractQuoteInfoFromChatPrompt(promptInput);
     return output!;
   }
 );
