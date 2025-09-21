@@ -13,7 +13,8 @@ export async function getAiResponse(
     const response = await extractQuoteInfoFromChat({ userInput, history });
     return response;
   } catch (error) {
-    console.error('Error getting AI response:', error);
+    console.error('Error getting AI response for input:', { userInput, history });
+    console.error(error);
     return {
       parsed: {
         cap: null,
