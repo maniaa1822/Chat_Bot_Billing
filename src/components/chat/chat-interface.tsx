@@ -56,7 +56,8 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      if (text === 'Genera preventivo' && lastAiResult) {
+      // If the user clicks "Genera preventivo" and we have enough data, show the quote.
+      if (text === 'Genera preventivo' && lastAiResult?.parsed) {
         const quote = calculateQuote(lastAiResult.parsed);
         const quoteMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -65,19 +66,23 @@ export function ChatInterface() {
           quote: quote,
         };
         setMessages((prev) => [...prev, quoteMessage]);
+        // Reset last AI result to allow for new conversations.
         setLastAiResult(null);
+        
+      // If we have collected all data, show recommendations.
       } else if (lastAiResult && lastAiResult.next_missing_field === null) {
         const recommendations = await getRecommendations(lastAiResult);
         const recommendationMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
           content:
-            'Ecco alcune azioni che puoi intraprendere:\n' +
-            recommendations.map((r) => `• ${r}`).join('\n'),
+            'Ecco alcune azioni che puoi intraprendere:',
+          actions: recommendations,
         };
         setMessages((prev) => [...prev, recommendationMessage]);
-        // Reset last AI result to avoid looping back here.
-        setLastAiResult(null);
+        // Keep lastAiResult so we can generate the quote next.
+
+      // Otherwise, continue the conversation to gather more data.
       } else {
         const aiResult = await getAiResponse(text, parsedData);
 

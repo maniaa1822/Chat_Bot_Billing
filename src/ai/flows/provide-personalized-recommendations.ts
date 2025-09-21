@@ -66,15 +66,11 @@ const prompt = ai.definePrompt({
   Confidence: {{{confidence}}}
   Notes: {{#each notes}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}
 
-  Examples of possible actions:
-  - Calcola preventivo rapido
-  - Aggiungi accumulo
-  - Domande frequenti
-  - Ottieni un preventivo personalizzato
-  - Parla con un esperto
-
-  The actions must be in italian.
-  Return an array of strings.  If no actions are relevant, return an empty array.
+  **RULES:**
+  - If all data is collected, one of the actions MUST be "Genera preventivo".
+  - Other possible actions include "Modifica dati" or "Parla con un esperto".
+  - The actions must be in Italian.
+  - Return an array of strings. If no actions are relevant, return an empty array.
   `,
 });
 
