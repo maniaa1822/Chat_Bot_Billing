@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { QuoteInfoOutput } from '@/ai/flows/extract-quote-info-from-chat';
-import { getAiResponse } from '@/app/actions';
+import { getAiResponse, getRecommendations } from '@/app/actions';
 import { CardContent } from '@/components/ui/card';
 import { ChatMessages } from './chat-messages';
 import { ChatInput } from './chat-input';
@@ -32,6 +32,9 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([initialMessage]);
   const [parsedData, setParsedData] =
     useState<QuoteInfoOutput['parsed'] | null>(null);
+  const [lastAiResult, setLastAiResult] = useState<QuoteInfoOutput | null>(
+    null
+  );
   const [aiState, setAiState] = useState<{
     confidence: string | null;
     notes: string[] | null;
@@ -50,22 +53,36 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const aiResult = await getAiResponse(text, parsedData);
+      // If all data is collected, get recommendations instead of more questions.
+      if (lastAiResult && lastAiResult.next_missing_field === null) {
+        const recommendations = await getRecommendations(lastAiResult);
+        const recommendationMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: recommendations.join('\n'),
+        };
+        setMessages((prev) => [...prev, recommendationMessage]);
+        // Reset last AI result to avoid looping back here.
+        setLastAiResult(null);
+      } else {
+        const aiResult = await getAiResponse(text, parsedData);
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: aiResult.reply,
-        actions: aiResult.suggest_actions,
-      };
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: aiResult.reply,
+          actions: aiResult.suggest_actions,
+        };
 
-      setMessages((prev) => [...prev, assistantMessage]);
-      const newParsedData = merge({}, parsedData, aiResult.parsed);
-      setParsedData(newParsedData);
-      setAiState({
-        confidence: aiResult.confidence,
-        notes: aiResult.notes,
-      });
+        setMessages((prev) => [...prev, assistantMessage]);
+        const newParsedData = merge({}, parsedData, aiResult.parsed);
+        setParsedData(newParsedData);
+        setAiState({
+          confidence: aiResult.confidence,
+          notes: aiResult.notes,
+        });
+        setLastAiResult(aiResult);
+      }
     } catch (error) {
       console.error(error);
       const errorMessage: Message = {

@@ -4,6 +4,10 @@ import {
   extractQuoteInfoFromChat,
   type QuoteInfoOutput,
 } from '@/ai/flows/extract-quote-info-from-chat';
+import {
+  providePersonalizedRecommendations,
+  type PersonalizedRecommendationsOutput,
+} from '@/ai/flows/provide-personalized-recommendations';
 
 export async function getAiResponse(
   userInput: string,
@@ -36,5 +40,19 @@ export async function getAiResponse(
       confidence: 'bassa',
       notes: ['An error occurred on the server.'],
     };
+  }
+}
+
+export async function getRecommendations(
+  quoteInfo: QuoteInfoOutput
+): Promise<PersonalizedRecommendationsOutput> {
+  try {
+    const response = await providePersonalizedRecommendations(quoteInfo);
+    return response;
+  } catch (e: any) {
+    console.error('Error in getRecommendations:', e);
+    return [
+      `Si è verificato un errore durante la generazione delle raccomandazioni: ${e.message}`,
+    ];
   }
 }
