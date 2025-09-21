@@ -227,7 +227,9 @@ const extractQuoteInfoFromChatFlow = ai.defineFlow(
     outputSchema: QuoteInfoOutputSchema,
   },
   async input => {
-    const {output} = await extractQuoteInfoFromChatPrompt(input);
+    // Exclude history if it's null
+    const promptInput = input.history ? input : { userInput: input.userInput };
+    const {output} = await extractQuoteInfoFromChatPrompt(promptInput);
     return output!;
   }
 );
