@@ -8,12 +8,15 @@ import { ChatMessages } from './chat-messages';
 import { ChatInput } from './chat-input';
 import { InfoSummary } from './info-summary';
 import { merge } from 'lodash';
+import { QuoteResult } from './quote-result';
+import { calculateQuote, type QuoteDetails } from '@/lib/quote-calculator';
 
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   actions?: string[];
+  quote?: QuoteDetails;
 }
 
 const initialMessage: Message = {
@@ -53,8 +56,17 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      // If all data is collected, get recommendations instead of more questions.
-      if (lastAiResult && lastAiResult.next_missing_field === null) {
+      if (text === 'Genera preventivo' && lastAiResult) {
+        const quote = calculateQuote(lastAiResult.parsed);
+        const quoteMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'Ecco una stima del tuo impianto fotovoltaico personalizzato:',
+          quote: quote,
+        };
+        setMessages((prev) => [...prev, quoteMessage]);
+        setLastAiResult(null);
+      } else if (lastAiResult && lastAiResult.next_missing_field === null) {
         const recommendations = await getRecommendations(lastAiResult);
         const recommendationMessage: Message = {
           id: (Date.now() + 1).toString(),

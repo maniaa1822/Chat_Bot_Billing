@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ChatActions } from './chat-actions';
 import { Skeleton } from '@/components/ui/skeleton';
+import { QuoteResult } from './quote-result';
 
 interface ChatMessageProps {
   message: Message;
@@ -59,6 +60,11 @@ export function ChatMessage({
         )}
       >
         <p className="whitespace-pre-wrap">{message.content}</p>
+        {message.quote && (
+          <div className="mt-4 bg-background p-4 rounded-lg border">
+            <QuoteResult quote={message.quote} />
+          </div>
+        )}
         {isAssistant && message.actions && onActionClick && (
           <ChatActions
             actions={message.actions}
