@@ -16,23 +16,23 @@ export function ChatMessages({
   isLoading,
   onActionClick,
 }: ChatMessagesProps) {
-  const viewportRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (viewportRef.current) {
-      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
 
   return (
-    <ScrollArea className="h-full w-full flex-grow" viewportRef={viewportRef}>
-      <div className="p-4 space-y-6">
+    <ScrollArea className="h-full w-full flex-grow">
+      <div className="p-4 space-y-6" ref={scrollAreaRef}>
         {messages.map((message, index) => (
           <ChatMessage
             key={message.id}
             message={message}
             onActionClick={onActionClick}
-            actionsDisabled={isLoading}
+            actionsDisabled={isLoading || index !== messages.length - 1}
           />
         ))}
         {isLoading && (
