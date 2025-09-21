@@ -13,10 +13,9 @@ export async function getAiResponse(
     const response = await extractQuoteInfoFromChat({ userInput, history: history ?? undefined });
     return response;
   } catch (error) {
-    console.error('Error getting AI response for input:', { userInput, history });
-    console.error(error);
+    console.error('Error in getAiResponse:', error);
     return {
-      parsed: {
+      parsed: history || {
         cap: null,
         dwelling: null,
         monthly_kwh: null,

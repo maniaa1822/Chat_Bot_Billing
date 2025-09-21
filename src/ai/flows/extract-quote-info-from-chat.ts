@@ -212,11 +212,6 @@ Example B — messy input
 
 Important: Return only the JSON object. No markdown, no extra text, no explanations outside reply/notes.
 Here is the user input: {{{userInput}}}
-{{#if history}}
-This is the information we have so far:
-{{{JSON.stringify history}}}
-Do not ask for this information again.
-{{/if}}
 `,
 });
 

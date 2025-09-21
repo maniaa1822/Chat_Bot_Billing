@@ -203,8 +203,7 @@ Important: Return only the JSON object. No markdown, no extra text, no explanati
 
 User Input: {{{userInput}}}
 
-Parsed Data: {{{JSON.stringify(parsed)}}
-
+Based on the user input and the already parsed data, provide the next response.
 `, 
 });
 
